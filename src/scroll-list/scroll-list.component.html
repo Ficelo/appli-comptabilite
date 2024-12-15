@@ -1,0 +1,31 @@
+<p-scrollPanel [style]="{ width: '100%', height: '100%' }">
+  <p-panel
+    [toggleable]="true"
+    collapsed="true"
+    *ngFor="let action of dataService.getData(); let i = index">
+    <ng-template pTemplate="header">
+      <div class="flex align-items-center gap-2">
+        <span class="font-bold">
+          {{(action["Debit"] !== "" ? action["Debit"] : action["Credit"])}} €<br>
+        </span>
+        <span>{{action["Libelle simplifie"]}}</span>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="footer">
+      <p>Date : {{action["Date de comptabilisation"]}}</p>
+      <p>Sous catégorie : {{action["Sous categorie"]}}</p>
+      <p>Type d'opération : {{action["Type Operation"]}}</p>
+      <p>Informations complémentaires : {{action["Informations complementaires"]}}</p>
+      <div [style.display]="'flex'" [style.align-items]="'center'">
+        <p style="margin: 0;">Catégorie :</p>
+        <p-dropdown
+          [style.padding-left]="'5px'"
+          [options]="categoriesOptions"
+          [(ngModel)]="action['Categorie']"
+          (onChange)="onCategoryChange($event, action, i)"
+          [placeholder]="action['Categorie']"
+        ></p-dropdown>
+      </div>
+    </ng-template>
+  </p-panel>
+</p-scrollPanel>

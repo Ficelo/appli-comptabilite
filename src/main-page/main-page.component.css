@@ -1,0 +1,32 @@
+.main-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 3fr 1fr;
+  height: 100vh;
+  gap: 5px;
+}
+
+app-file-input {
+  grid-column: 1 / 2;
+  grid-row: 2;
+  margin-left: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+app-scroll-list {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  background-color: #bcb3b3;
+  margin: 10px;
+  border-radius: 5px;
+}
+
+app-stats {
+  grid-column: 1;
+  grid-row: 1;
+  /*background-color: #bcb3b3;*/
+  margin-left: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+}

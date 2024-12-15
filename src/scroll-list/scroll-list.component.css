@@ -1,0 +1,22 @@
+:host ::ng-deep .p-panel {
+  margin: 5px;
+}
+
+:host ::ng-deep .p-panel-header {
+  border-radius: 5px;
+}
+
+:host ::ng-deep .p-panel-content {
+  display:none;
+}
+
+:host ::ng-deep .p-panel-footer {
+  border-radius: 5px 5px 0px 0px;
+}
+
+
+
+:host ::ng-deep .p-scrollpanel .p-scrollpanel-bar {
+  background-color: #bcb3b3;
+  display: none;
+}

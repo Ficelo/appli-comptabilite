@@ -1,0 +1,20 @@
+.chart-container {
+  display: flex;             /* Display the pie chart and div side by side */
+  width: 100%;               /* Take full width of the parent container */
+  max-height: 600px;         /* Limit the height to 600px */
+}
+
+.chart-container p-chart,
+.chart-container .text-container {
+  flex: 1;                   /* Both the chart and text take up equal space */
+  max-height: 100%;          /* Ensure the height fits within the container */
+  padding: 10px;             /* Add padding for some spacing */
+  box-sizing: border-box;    /* Include padding in the element's total width */
+}
+
+.text-container {
+  display: flex;
+  flex-direction: column;    /* Stack text items vertically */
+  justify-content: center;   /* Center the text vertically */
+  padding-left: 20px;        /* Optional: Add some space between chart and text */
+}

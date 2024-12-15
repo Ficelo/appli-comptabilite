@@ -1,0 +1,9 @@
+:host ::ng-deep .p-fileupload .p-fileupload-buttonbar {
+  width: 100%;
+  margin: 0 auto;
+}
+
+:host ::ng-deep .p-fileupload-content {
+  padding: 0;
+  height: 120px;
+}

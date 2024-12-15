@@ -1,0 +1,12 @@
+<div>
+  <form [formGroup]="form">
+    <p-fileUpload
+      #fileUpload
+      [customUpload]="true"
+      accept="text/csv"
+      (uploadHandler)="uploadFile($event)"
+      mode="advanced"
+    ></p-fileUpload>
+  </form>
+</div>
+
