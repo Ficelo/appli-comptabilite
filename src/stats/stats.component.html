@@ -7,7 +7,9 @@
       <p>Autres : {{dataService.getDepenseCategorie(CategoriesEnum.SHOPPING)}} €</p>
       <p>Aides : {{dataService.getDepenseCategorie(CategoriesEnum.REVENUS)}} €</p>
       <p-button label="Copier" (click)="copyToClipboard()"></p-button><br>
-      <p-multiSelect [options]="categoriesAffichage" placeholder="Catégories à afficher"></p-multiSelect>
+      <form [formGroup]="formGroup">
+        <p-multiSelect formControlName="formControl" [options]="Object.keys(categoriesAffichage)" placeholder="Catégories à afficher"></p-multiSelect>
+      </form>
     </div>
   </div>
 </div>

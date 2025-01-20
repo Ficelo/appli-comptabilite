@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {fileDataService} from "../services/fileData.service";
 import {ChartModule} from "primeng/chart";
 import {CategoriesEnum} from "../enums/categories.enum";
@@ -7,6 +7,7 @@ import {MessageService} from "primeng/api";
 import {Clipboard} from '@angular/cdk/clipboard';
 import {NgForOf} from "@angular/common";
 import {MultiSelectModule} from "primeng/multiselect";
+import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
 
 @Component({
   selector: 'app-stats',
@@ -15,27 +16,49 @@ import {MultiSelectModule} from "primeng/multiselect";
     ChartModule,
     Button,
     NgForOf,
-    MultiSelectModule
+    MultiSelectModule,
+    ReactiveFormsModule
   ],
   templateUrl: './stats.component.html',
   styleUrl: './stats.component.css'
 })
-export class StatsComponent {
+export class StatsComponent implements OnInit {
 
   data : any[];
   chartOptions : any;
   pieOptions : any;
+  formGroup!: FormGroup;
 
-  categoriesAffichage = [
-    CategoriesEnum.LOGEMENT,
-    CategoriesEnum.ALIMENTATION,
-    CategoriesEnum.LOISIRS,
-    CategoriesEnum.SHOPPING,
-    CategoriesEnum.SANTE,
-    CategoriesEnum.EDUCATION,
-    CategoriesEnum.BANQUES_ASSURANCES,
-    CategoriesEnum.A_CATEGORISER_SORTIE
-  ]
+  categoriesAffichage = {
+    [CategoriesEnum.ALIMENTATION]: true,
+    [CategoriesEnum.SHOPPING]: true,
+    [CategoriesEnum.LOGEMENT]: true,
+    [CategoriesEnum.A_CATEGORISER_RENTREE]: true,
+    [CategoriesEnum.A_CATEGORISER_SORTIE]: true,
+    [CategoriesEnum.SANTE]: true,
+    [CategoriesEnum.BANQUES_ASSURANCES]: true,
+    [CategoriesEnum.LOISIRS]: true,
+    [CategoriesEnum.REVENUS]: true,
+    [CategoriesEnum.EDUCATION]: true
+  };
+
+
+  // Faire en sorte que quand on clique ça enlève ou rajoute
+  categoryDictionary= {
+    [CategoriesEnum.ALIMENTATION]: 0,
+    [CategoriesEnum.SHOPPING]: 0,
+    [CategoriesEnum.LOGEMENT]: 0,
+    [CategoriesEnum.A_CATEGORISER_RENTREE]: 0,
+    [CategoriesEnum.A_CATEGORISER_SORTIE]: 0,
+    [CategoriesEnum.SANTE]: 0,
+    [CategoriesEnum.BANQUES_ASSURANCES]: 0,
+    [CategoriesEnum.LOISIRS]: 0,
+    [CategoriesEnum.REVENUS]: 0,
+    [CategoriesEnum.EDUCATION]: 0
+  };
+
+  allCategories = Object.keys(CategoriesEnum).map(key => CategoriesEnum[key as keyof typeof CategoriesEnum]);
+  formControl = new FormControl<string[]>([]);
 
   constructor(protected dataService: fileDataService, private messageService : MessageService, private clipboard : Clipboard) {
     this.data = this.dataService.getData();
@@ -63,10 +86,31 @@ export class StatsComponent {
     };
   }
 
+  ngOnInit() {
+    // Initialize formGroup with formControl
+    this.formGroup = new FormGroup({
+      formControl: this.formControl
+    });
+
+    // Set initial values for categoriesAffichage based on the form control
+    const initialSelection = Object.keys(this.categoriesAffichage)
+      .filter(category => this.categoriesAffichage[category as CategoriesEnum]);
+
+    this.formControl.setValue(initialSelection);
+
+    // Listen to changes in form control value (selected categories)
+    this.formControl.valueChanges.subscribe(selectedCategories => {
+      // Update categoriesAffichage based on the selection
+      for (let category of this.allCategories) {
+        this.categoriesAffichage[category] = selectedCategories?.includes(category) ?? false;
+      }
+    });
+  }
 
 
   createUsableData(data: any[]) {
-    let categoryDictionary: { [key in CategoriesEnum]: number } = {
+
+    this.categoryDictionary= {
       [CategoriesEnum.ALIMENTATION]: 0,
       [CategoriesEnum.SHOPPING]: 0,
       [CategoriesEnum.LOGEMENT]: 0,
@@ -79,44 +123,38 @@ export class StatsComponent {
       [CategoriesEnum.EDUCATION]: 0
     };
 
-    for (let action of data) {
-      if (action["Debit"] !== "") {
-        let montant = parseFloat(action["Debit"]);
-        let categorie: string = action["Categorie"];
 
+    for (let action of data) {
+      if (action["Debit"]) {
+        let montant = parseFloat(action["Debit"].replace(",", "."));
+        let categorie: string = action["Categorie"];
         if (Object.values(CategoriesEnum).includes(categorie as CategoriesEnum)) {
-          categoryDictionary[categorie as CategoriesEnum] += montant;
+          console.log("categorie before : ", this.categoryDictionary[categorie as CategoriesEnum])
+          this.categoryDictionary[categorie as CategoriesEnum] += montant;
+          console.log("categorie after : ", this.categoryDictionary[categorie as CategoriesEnum])
         } else {
           console.warn(`Invalid category: ${categorie}`);
         }
       }
     }
 
-    const labels = Object.values(CategoriesEnum);
-    const dataValues = labels.map((label) => categoryDictionary[label]);
+    const labels = [];
+    for (let label of Object.values(CategoriesEnum)) {
+      if (this.categoriesAffichage[label]) {
+        labels.push(label);
+      }
+    }
+
+    const dataValues = labels.map((label) => this.categoryDictionary[label]);
 
     const backgroundColors = [
-      'rgba(255, 159, 64, 0.2)',
-      'rgba(75, 192, 192, 0.2)',
-      'rgba(54, 162, 235, 0.2)',
-      'rgba(153, 102, 255, 0.2)',
-      'rgba(255, 99, 132, 0.2)',
-      'rgba(255, 159, 64, 0.2)',
-      'rgba(75, 192, 192, 0.2)',
-      'rgba(54, 162, 235, 0.2)',
-      'rgba(153, 102, 255, 0.2)'
+      "#9e0142", "#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#e6f598",
+      "#66c2a5", "#3288bd", "#5e4fa2", "#ff8c00"
     ];
 
     const borderColors = [
-      'rgb(255, 159, 64)',
-      'rgb(75, 192, 192)',
-      'rgb(54, 162, 235)',
-      'rgb(153, 102, 255)',
-      'rgb(255, 99, 132)',
-      'rgb(255, 159, 64)',
-      'rgb(75, 192, 192)',
-      'rgb(54, 162, 235)',
-      'rgb(153, 102, 255)'
+      "#9e0142", "#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#e6f598",
+      "#66c2a5", "#3288bd", "#5e4fa2", "#ff8c00"
     ];
 
     return {
@@ -140,4 +178,5 @@ export class StatsComponent {
 
   protected readonly fileDataService = fileDataService;
   protected readonly CategoriesEnum = CategoriesEnum;
+  protected readonly Object = Object;
 }
